@@ -47,7 +47,13 @@ code {
 .configEditor-container {
   grid-area: 1 / 2 / 1 / 2;
   border-right: 1px solid #3E3E3E;
-  background-color: #7E7E7E;
+  /* background-color: #7E7E7E; */
+  padding: 20px;
+}
+
+.identifier:hover {
+  text-decoration-line: underline;
+  cursor: pointer;
 }
 
 .docExplorer-container {
