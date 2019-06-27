@@ -17,11 +17,11 @@ const ast = parse(s)
 
 console.log(ast)
 
-const Identifier = ({ value, raw }) => {
+const Identifier = ({ handleKeySelect, value, raw }) => {
   return (
     <span
       className='identifier'
-      onClick={() => console.log(`${value} was clicked`)}
+      onClick={() => handleKeySelect(value)}
     >
       {raw}
     </span>
@@ -95,7 +95,7 @@ function build(obj, args = { isRoot: true }) {
   }
 }
 
-const ConfigEditor = () => (
+const ConfigEditor = ({ handleKeySelect }) => (
   <div className="configEditor-container">
     <pre>
       <code>
@@ -104,7 +104,14 @@ const ConfigEditor = () => (
           {
             transform: ({ name, attribs }, index) => {
               if (name === 'span') {
-                return <Identifier key={`Identifier-${index}`} value={attribs['data-value']} raw={attribs['data-raw']}/>
+                return (
+                  <Identifier
+                    key={`Identifier-${index}`}
+                    value={attribs['data-value']}
+                    raw={attribs['data-raw']}
+                    handleKeySelect={handleKeySelect}
+                  />
+                )
               }
             }
           }
