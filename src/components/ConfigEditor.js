@@ -33,7 +33,9 @@ function conStr(strArr) {
   return strArr.join('')
 }
 
-function build(obj, args = { isRoot: true }) {
+// Recursive build method transforms JSON AST into HTML String
+function build(obj, args = {}) {
+  // Everything in JS is an object; thus check if obj is an array before checking if it is an object
   if (Array.isArray(obj)) {
     return obj.reduce(
       (accumulator, child, index) =>
@@ -57,7 +59,8 @@ function build(obj, args = { isRoot: true }) {
         ),
       ''
     )
-  } else if (typeof obj === 'object') {
+  } else if (typeof obj === 'object') { // make sure obj is not a primitive type
+    // match the obj type
     switch (obj.type) {
       case 'Object':
         return conStr([
@@ -100,7 +103,7 @@ const ConfigEditor = ({ handleKeySelect }) => (
     <pre>
       <code>
         {ReactHtmlParser(
-          build(ast),
+          build(ast, { isRoot: true }),
           {
             transform: ({ name, attribs }, index) => {
               if (name === 'span') {
