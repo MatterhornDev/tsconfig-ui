@@ -49,6 +49,7 @@ code {
   border-right: 1px solid #3E3E3E;
   /* background-color: #7E7E7E; */
   padding: 20px;
+  overflow: scroll;
 }
 
 .identifier:hover {
@@ -60,4 +61,24 @@ code {
   grid-area: 1 / 3 / 1 / 3;
   background-color: rgb(237, 237, 237);
   padding: 10px;
+}
+
+.search-input {
+  width: 100%;
+}
+
+.search-list {
+  max-height: 200px;
+  position: relative;
+  width: 100%;
+  background: #fff;
+}
+
+
+
+.search-list-item:nth-child(n+1) {
+  background-color: rgb(242, 242, 242);
+}
+.search-list-item:nth-child(2n+1) {
+  background-color: rgb(255, 255, 255);
 }
