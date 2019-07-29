@@ -1,11 +1,12 @@
 import React from 'react'
 import ReactHtmlParser from 'react-html-parser'
+import deepEqual from 'deep-equal'
 
-const ConfigOption = ({ handleKeySelect, value }) => {
+const ConfigOption = ({ handleOptionSelect, value, defaultValue }) => {
   return (
     <span
       className='identifier'
-      onClick={() => handleKeySelect(value)}
+      onClick={() => handleOptionSelect(value)}
     >
       "{value}"
     </span>
@@ -13,16 +14,16 @@ const ConfigOption = ({ handleKeySelect, value }) => {
 }
 
 function genCodeString ( data ) {
-  let str = '{'
-  data && data.forEach(v => {
-    str += (
-      '\n' +
-      `  <span data-value="${v.option}">"${v.option}"</span>` +
-      ': ' +
-      `${v.defaultValue},`
-    )
+  let str = '{\n  "compilerOptions": {'
+  data && data.forEach((v, i) => {
+    str += 
+      '\n    ' + 
+      `<span data-value="${v.option}"></span>` + 
+      ': ' + 
+      v.defaultValue + 
+      (i === data.length - 1 ? '' : ',')
   })
-  str += '\n}'
+  str += '\n  }\n}'
   return str
 }
 
@@ -31,6 +32,14 @@ class ConfigEditor extends React.Component {
     isLoadingMainEditor: false,
     json: undefined
   }
+
+  componentDidUpdate(prevProps) {
+    console.log(this.props.controlledOptions, prevProps.controlledOptions)
+    if (!deepEqual(prevProps.controlledOptions, this.props.controlledOptions)) {
+      console.log('🎉')
+    }
+  }
+
   componentDidMount() {
     this.setState({
       isLoadingMainEditor: true
@@ -61,7 +70,8 @@ class ConfigEditor extends React.Component {
                           <ConfigOption
                             key={`option-${index}`}
                             value={attribs['data-value']}
-                            handleKeySelect={this.props.handleKeySelect}
+                            defaultValue={attribs['data-defaultValue']}
+                            handleOptionSelect={this.props.handleOptionSelect}
                           />
                         )
                       }

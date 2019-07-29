@@ -1,59 +1,29 @@
 import React from 'react'
 import SelectSearch from 'react-select-search'
 
-// const DocExplorer = ({ selectedKey }) => {
-//   return (
-//     <div className='docExplorer-container'>
-//       <h1>{selectedKey || 'Select a key'}</h1>
-//       <p>I don't do anything just yet, but in the future I'll make GET requests to tsconfig-api to get documentation details on the TypeScript configuration property you just selected - <span role='img' aria-label='ghost emoji'>👻</span></p>
-//     </div>
-//   )
-// }
-
-const SearchList = ({ data = [] }) => {
-  return (
-    <ul className='search-list-container'>
-      {
-        data.map((s, i) => <li key={i} className='search-list-item'>{s}</li>)
-      }
-    </ul>
-  )
-}
-
-const callSelectSearch = (data = []) => {
-  const options = data.map(k => ({
-    name: k,
-    value: k
-  }))
-  return (
-    <SelectSearch 
-      options={options}
-      className='search-list'
-    />
-  )
-}
-
 class DocExplorer extends React.Component {
   state = {
     isLoadingDocs: undefined,
     data: undefined,
     searchText: '',
-    keys: undefined,
+    options: [],
     searchList: []
   }
+
   async componentDidMount() {
-    const res = await fetch(`http://localhost:3000/tsconfig/keys`)
-    const keys = await res.json()
+    const res = await fetch(`http://localhost:3000/tsconfig/options`)
+    const options = await res.json()
     this.setState({
-      keys
+      options
     })
   }
+
   componentDidUpdate(prevProps) {
-    if (this.props.selectedKey !== prevProps.selectedKey) {
+    if (this.props.selectedOption !== prevProps.selectedOption) {
       this.setState({
         isLoadingDocs: true
       }, async () => {
-        const res = await fetch(`http://localhost:3000/tsconfig?option=${this.props.selectedKey}`)
+        const res = await fetch(`http://localhost:3000/tsconfig?option=${this.props.selectedOption}`)
         const data = await res.json()
         console.log(data)
         this.setState({
@@ -63,31 +33,45 @@ class DocExplorer extends React.Component {
       })
     }
   }
-  handleInput = ({ target: { value }}) => {
-    console.log(value)
-    this.setState({
-      searchText: value,
-      searchList: this.state.keys.filter(key => value && key.indexOf(value) > -1)
-    })
-  }
+
   render() {
     return (
       <div className='docExplorer-container'>
-        {/*<div className='search-container'>*/}
-          { /* <input type="text" className="search-input" placeholder="Search..." value={this.state.searchText} onChange={this.handleInput} />
-           <SearchList data={this.state.searchList} /> */ }
-          { callSelectSearch(this.state.keys) }
-        {/*</div>*/}
-        <h1>{this.props.selectedKey || 'Select a key'}</h1>
+        <SelectSearch
+          className='search-list'
+          options={this.state.options.map(k => ({ name: k, value: k }))}
+          placeholder='tsconfig compiler option'
+          value={this.props.selectedOption}
+          onChange={({ value }) => this.props.handleOptionSelect(value)}
+        />
+        <h1>{this.props.selectedOption || 'Select a compiler option'}</h1>
         {
           this.state.isLoadingDocs !== undefined && (
             !this.state.isLoadingDocs && this.state.data !== undefined ? (
-              <p>{this.state.data.description}</p>
+              <React.Fragment>
+                
+                <div className='option-controller-container'>
+                  <button 
+                    className='option-controller-button add-button'
+                    onClick={() => this.props.addOption({
+                      value: this.props.selectedOption
+                    })}
+                  >Add</button>
+                  <button 
+                    className='option-controller-button remove-button'
+                    onClick={() => this.props.removeOption({
+                      value: this.props.selectedOption
+                    })}
+                  >Remove</button>
+                  <button className='option-controller-button edit-button'>Edit</button>
+                </div>
+              </React.Fragment>
             ) : (
               <p>Loading . . .</p>
             )
           )
         }
+        
       </div>
     )
   }

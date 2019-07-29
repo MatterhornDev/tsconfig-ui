@@ -63,7 +63,7 @@ code {
   padding: 10px;
 }
 
-.search-input {
+/* .search-input {
   width: 100%;
 }
 
@@ -74,11 +74,112 @@ code {
   background: #fff;
 }
 
-
-
 .search-list-item:nth-child(n+1) {
   background-color: rgb(242, 242, 242);
 }
 .search-list-item:nth-child(2n+1) {
   background-color: rgb(255, 255, 255);
+} */
+
+.search-list {
+  width: 100%;
+  position: relative;
+  margin-bottom: 10px;
+  background: transparent;
+}
+
+.search-list__search {
+  display: block;
+  width: 100%;
+  height: 46px;
+  box-sizing: border-box;
+  font-size: 16px;
+  color: #555;
+  border: 1px solid #616b74;
+  position: relative;
+  z-index: 2;
+  padding-left: 10px;
+}
+
+.search-list__search--placeholder {
+  font-style: italic;
+  font-weight: normal;
+}
+
+.search-list__select {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #fff;
+  overflow: auto;
+  z-index: 3;
+  min-height: 49px;
+}
+
+.search-list__select--display {
+  display: block;
+}
+
+.search-list__options {
+  margin: 0;
+}
+
+.search-list__option {
+  font-size: 16px;
+  font-weight: 400;
+  color: #616b74;
+  padding: 10px;
+  margin: 0;
+  border-top: 1px solid #eee;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.search-list__option:first-child {
+  border-top: none;
+}
+
+.search-list__option--hover, .search-list__option:hover {
+  background: #f4f7fa;
+}
+
+.search-list__option--selected {
+  background: #54A0FF;
+  color: #fff;
+  border-top-color: #2184FF;
+}
+
+.search-list__option--selected:hover, .search-list__option--selected .search-list__option--hover {
+  background: #2184FF;
+  color: #fff;
+  border-top-color: #2184FF;
+}
+
+.option-controller-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.option-controller-button {
+  color: #fff;
+  padding: 5px 15px;
+  cursor: pointer;
+}
+.add-button {
+  background: rgb(40, 167, 69);
+  border: 1px solid rgb(40, 167, 69);
+}
+.remove-button {
+  background: rgb(220, 53, 69);
+  border: 1px solid rgb(220, 53, 69);
+}
+.edit-button {
+  background: rgb(0, 123, 255);
+  border: 1px solid rgb(0, 123, 255);
 }

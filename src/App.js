@@ -6,21 +6,49 @@ import DocExplorer from './components/DocExplorer'
 
 class App extends React.Component {
   state = {
-    selectedKey: undefined
+    selectedOption: undefined,
+    controlledOptions: {}
   }
 
-  onKeySelect = (value) => {
+  onSelectOption = (value) => {
     console.log(value)
     this.setState({
-      selectedKey: value
+      selectedOption: value
     })
   }
+
+  addOption = ({value, defaultValue}) => {
+    console.log('foo')
+    if (!this.state.controlledOptions.hasOwnProperty(value)) {
+      this.setState(({ controlledOptions }) => {
+        controlledOptions[value] = defaultValue
+        return { controlledOptions }
+      })
+    }
+  }
+
+  removeOption = (value) => {
+    if (this.state.controlledOptions.hasOwnProperty(value)) {
+      this.setState(({ controlledOptions }) => {
+        delete controlledOptions[value]
+        return { controlledOptions }
+      })
+    }
+  }
+
   render () {
     return (
       <div className='app-container'>
         <Sidebar />
-        <ConfigEditor handleKeySelect={this.onKeySelect} />
-        <DocExplorer selectedKey={this.state.selectedKey} />
+        <ConfigEditor
+          controlledOptions={this.state.controlledOptions}
+          handleOptionSelect={this.onSelectOption} 
+        />
+        <DocExplorer 
+        addOption={this.addOption}
+        removeOption={this.removeOption}
+        selectedOption={this.state.selectedOption} 
+        handleOptionSelect={this.onSelectOption} />
       </div>
     );
   }
