@@ -49,7 +49,16 @@ class DocExplorer extends React.Component {
           this.state.isLoadingDocs !== undefined && (
             !this.state.isLoadingDocs && this.state.data !== undefined ? (
               <React.Fragment>
-                
+                <p>{this.state.data.extendedDescription}</p>
+                <ul>
+                  {
+                    this.state.data.refLinks.map(ref => (
+                      <li>
+                        <a href={ref.link}>{ref.title}</a>
+                      </li>
+                    ))
+                  }
+                </ul>
                 <div className='option-controller-container'>
                   <button 
                     className='option-controller-button add-button'
