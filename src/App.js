@@ -17,17 +17,18 @@ class App extends React.Component {
     })
   }
 
-  addOption = ({value, defaultValue}) => {
-    console.log('foo')
+  addOption = async ({value, defaultValue}) => {
     if (!this.state.controlledOptions.hasOwnProperty(value)) {
+      const res = await fetch(`http://localhost:3000/tsconfig?option=${value}`)
+      const data = await res.json()
       this.setState(({ controlledOptions }) => {
-        controlledOptions[value] = defaultValue
+        controlledOptions[value] = data.defaultValue
         return { controlledOptions }
       })
     }
   }
 
-  removeOption = (value) => {
+  removeOption = ({ value }) => {
     if (this.state.controlledOptions.hasOwnProperty(value)) {
       this.setState(({ controlledOptions }) => {
         delete controlledOptions[value]
