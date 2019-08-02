@@ -5,35 +5,44 @@ import ConfigEditor from './components/ConfigEditor'
 import DocExplorer from './components/DocExplorer'
 
 class App extends React.Component {
+
+
   state = {
     selectedOption: undefined,
-    controlledOptions: {}
+    configuration: undefined
   }
 
+  setConfiguration = configuration => this.setState({ configuration })
+
   onSelectOption = (value) => {
-    console.log(value)
     this.setState({
       selectedOption: value
     })
   }
 
-  addOption = async ({value, defaultValue}) => {
-    if (!this.state.controlledOptions.hasOwnProperty(value)) {
+  addOption = async ({ value }) => {
+    const { configuration } = this.state
+
+    if (!configuration.hasOwnProperty('compilerOptions')) {
+      configuration['compilerOptions'] = {}
+    }
+
+    if (!configuration.compilerOptions.hasOwnProperty(value)) {
       const res = await fetch(`http://localhost:3000/tsconfig?option=${value}`)
       const data = await res.json()
-      this.setState(({ controlledOptions }) => {
-        controlledOptions[value] = data.defaultValue
-        return { controlledOptions }
-      })
+      configuration.compilerOptions[value] = data.defaultValue
+      this.setState({ configuration })
     }
   }
 
   removeOption = ({ value }) => {
-    if (this.state.controlledOptions.hasOwnProperty(value)) {
-      this.setState(({ controlledOptions }) => {
-        delete controlledOptions[value]
-        return { controlledOptions }
-      })
+    const { configuration } = this.state
+
+    if (!configuration.hasOwnProperty('compilerOptions')) return
+
+    if (configuration.compilerOptions.hasOwnProperty(value)) {
+      delete configuration.compilerOptions[value]
+      this.setState({ configuration })
     }
   }
 
@@ -42,14 +51,17 @@ class App extends React.Component {
       <div className='app-container'>
         <Sidebar />
         <ConfigEditor
-          controlledOptions={this.state.controlledOptions}
-          handleOptionSelect={this.onSelectOption} 
+          configuration={this.state.configuration}
+          handleSetConfiguration={this.setConfiguration}
+          handleOptionSelect={this.onSelectOption}
         />
-        <DocExplorer 
-        addOption={this.addOption}
-        removeOption={this.removeOption}
-        selectedOption={this.state.selectedOption} 
-        handleOptionSelect={this.onSelectOption} />
+        <DocExplorer
+          handleAddOption={this.addOption}
+          handleRemoveOption={this.removeOption}
+          handleEditOption={this.editOption}
+          selectedOption={this.state.selectedOption} 
+          handleOptionSelect={this.onSelectOption}
+        />
       </div>
     );
   }

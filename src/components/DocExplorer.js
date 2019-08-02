@@ -1,5 +1,8 @@
 import React from 'react'
 import SelectSearch from 'react-select-search'
+import MarkdownIt from 'markdown-it'
+
+const md = new MarkdownIt()
 
 class DocExplorer extends React.Component {
   state = {
@@ -46,10 +49,13 @@ class DocExplorer extends React.Component {
         />
         <h1>{this.props.selectedOption || 'Select a compiler option'}</h1>
         {
+          
           this.state.isLoadingDocs !== undefined && (
             !this.state.isLoadingDocs && this.state.data !== undefined ? (
               <React.Fragment>
-                <p>{this.state.data.extendedDescription}</p>
+                <div dangerouslySetInnerHTML={{__html: md.render(this.state.data.extendedDescription)}}/>
+                <hr />
+                <strong>References</strong>
                 <ul>
                   {
                     this.state.data.refLinks.map(ref => (
@@ -59,16 +65,17 @@ class DocExplorer extends React.Component {
                     ))
                   }
                 </ul>
+                <hr />
                 <div className='option-controller-container'>
                   <button 
                     className='option-controller-button add-button'
-                    onClick={() => this.props.addOption({
+                    onClick={() => this.props.handleAddOption({
                       value: this.props.selectedOption
                     })}
                   >Add</button>
                   <button 
                     className='option-controller-button remove-button'
-                    onClick={() => this.props.removeOption({
+                    onClick={() => this.props.handleRemoveOption({
                       value: this.props.selectedOption
                     })}
                   >Remove</button>

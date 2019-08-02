@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactHtmlParser from 'react-html-parser'
-import deepEqual from 'deep-equal'
 
-const ConfigOption = ({ handleOptionSelect, value, defaultValue }) => {
+const ConfigOption = ({ handleOptionSelect, value }) => {
   return (
     <span
       className='identifier'
@@ -11,6 +10,31 @@ const ConfigOption = ({ handleOptionSelect, value, defaultValue }) => {
       "{value}"
     </span>
   )
+}
+
+function genCodeString2 (data = {}) {
+  let str = '{\n'
+  for (let k in data) {
+    str += '  "' + k + '": {'
+
+    if (Object.keys(data[k]) === []) {
+      str += ' },\n'
+      continue
+    }
+
+    for (let l in data[k]) {
+      str +=
+        '\n    ' +
+        `<span data-value="${l}"></span>` +
+        ': ' +
+        data[k][l] +
+        ','
+    }
+
+    str += '\n  },\n'
+  }
+  str += '}'
+  return str
 }
 
 function genCodeString ( data ) {
@@ -28,41 +52,29 @@ function genCodeString ( data ) {
 }
 
 class ConfigEditor extends React.Component {
-  state = {
-    isLoadingMainEditor: false,
-    json: undefined
-  }
-
-  componentDidUpdate(prevProps) {
-    console.log(this.props.controlledOptions, prevProps.controlledOptions)
-    if (!deepEqual(prevProps.controlledOptions, this.props.controlledOptions)) {
-      console.log('🎉')
+  async componentDidMount() {
+    const res = await fetch('http://localhost:3000/tsconfig/defaults')
+    const json = await res.json()
+    const configuration = {
+      compilerOptions: {}
     }
+
+    json.forEach(v => configuration.compilerOptions[v.option] = v.defaultValue)
+
+    this.props.handleSetConfiguration(configuration)
   }
 
-  componentDidMount() {
-    this.setState({
-      isLoadingMainEditor: true
-    }, async () => {
-      const res = await fetch('http://localhost:3000/tsconfig/defaults')
-      const json = await res.json()
-      this.setState({
-        isLoadingMainEditor: false,
-        json
-      })
-    })
-  }
   render() {
     return (
       <div className="configEditor-container">
-        {this.state.isLoadingMainEditor ? (
+        {!this.props.configuration ? (
           <p>Loading . . .</p>
         ) : (
           <pre>
             <code>
               {
                 ReactHtmlParser(
-                  genCodeString(this.state.json),
+                  genCodeString2(this.props.configuration),
                   {
                     transform: ({ name, attribs }, index) => {
                       if (name === 'span') {
@@ -70,7 +82,6 @@ class ConfigEditor extends React.Component {
                           <ConfigOption
                             key={`option-${index}`}
                             value={attribs['data-value']}
-                            defaultValue={attribs['data-defaultValue']}
                             handleOptionSelect={this.props.handleOptionSelect}
                           />
                         )
