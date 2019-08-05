@@ -6,11 +6,11 @@ GitHubTheme.plugins = [
   new CodePlugin()
 ]
 
-GitHubTheme.overrideThemeStyles = () => ({
-  'code': {
-    fontSize: '1rem'
-  }
-})
+// GitHubTheme.overrideThemeStyles = () => ({
+//   'code': {
+//     fontSize: '1rem'
+//   }
+// })
 
 const typography = new Typography(GitHubTheme)
 

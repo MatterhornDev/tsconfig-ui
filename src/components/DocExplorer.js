@@ -1,16 +1,57 @@
 import React from 'react'
 import SelectSearch from 'react-select-search'
+import Select from 'react-select'
 import MarkdownIt from 'markdown-it'
 
 const md = new MarkdownIt()
 
+class Edit extends React.Component {
+  state = {
+    options: undefined
+  }
+  options = {
+    boolean: [
+      { value: true, label: 'true' },
+      { value: false, label: 'false' },
+    ]
+  }
+  componentDidUpdate(prevProps) {
+    if (prevProps.type !== this.props.type) {
+      this.setState({
+        options: this.options[this.props.type]
+      })
+    }
+  }
+  componentDidMount() {
+    this.setState({
+      options: this.options[this.props.type]
+    })
+  }
+  render() {
+    const { options } = this.state
+    const { selectedOption, handleChange } = this.props
+    return (
+      <Select 
+        value={selectedOption}
+        onChange={handleChange}
+        options={options}
+        className='option-controller-select'
+      />
+    )
+  }
+}
 class DocExplorer extends React.Component {
   state = {
     isLoadingDocs: undefined,
     data: undefined,
     searchText: '',
     options: [],
-    searchList: []
+    searchList: [],
+    selectedEditOption: undefined
+  }
+
+  handleChangeEditOption = selectedEditOption => {
+    this.setState({ selectedEditOption })
   }
 
   async componentDidMount() {
@@ -28,7 +69,6 @@ class DocExplorer extends React.Component {
       }, async () => {
         const res = await fetch(`http://localhost:3000/tsconfig?option=${this.props.selectedOption}`)
         const data = await res.json()
-        console.log(data)
         this.setState({
           isLoadingDocs: false,
           data
@@ -58,8 +98,8 @@ class DocExplorer extends React.Component {
                 <strong>References</strong>
                 <ul>
                   {
-                    this.state.data.refLinks.map(ref => (
-                      <li>
+                    this.state.data.refLinks.map((ref, i) => (
+                      <li key={`ref-${i}`}>
                         <a href={ref.link}>{ref.title}</a>
                       </li>
                     ))
@@ -79,8 +119,31 @@ class DocExplorer extends React.Component {
                       value: this.props.selectedOption
                     })}
                   >Remove</button>
-                  <button className='option-controller-button edit-button'>Edit</button>
-                </div>
+                  </div>
+                  <hr />
+                  <div className='option-controller-container'>
+                    {
+                      this.props.configuration.compilerOptions.hasOwnProperty(this.props.selectedOption) ? (
+                        <React.Fragment>
+                          <Edit
+                            selectedOption={this.state.editOption}
+                            handleChange={this.handleChangeEditOption}
+                            type={this.state.data.type}
+                          />
+                          <button
+                            type="button"
+                            className='option-controller-button edit-button'
+                            onClick={() => this.props.handleEditOption({
+                              option: this.props.selectedOption,
+                              value: this.state.selectedEditOption.value
+                            })}
+                          >Edit</button>
+                        </React.Fragment>
+                      ) : (
+                        <p>Add this element to the configuration to edit it</p>
+                      )
+                    }
+                  </div>
               </React.Fragment>
             ) : (
               <p>Loading . . .</p>

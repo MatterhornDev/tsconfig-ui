@@ -36,6 +36,16 @@ code {
   width: 100%;
 }
 
+.download-button, 
+.reset-button, 
+.save-button {
+  border: none;
+  background: none;
+  box-shadow: none;
+  cursor: pointer;
+  max-width: 50px;
+}
+
 .matterhorn-logo {
   max-width: 128px;
 }
@@ -50,6 +60,10 @@ code {
   /* background-color: #7E7E7E; */
   padding: 20px;
   overflow: scroll;
+}
+
+.configEditor {
+  font-size: 0.9rem;
 }
 
 .identifier:hover {
@@ -165,6 +179,11 @@ code {
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
+  padding-bottom: 0.8125rem;
+}
+
+.option-controller-select {
+  width: 50%;
 }
 
 .option-controller-button {

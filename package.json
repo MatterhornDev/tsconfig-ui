@@ -5,6 +5,7 @@
   "dependencies": {
     "conditional-reduce": "^1.2.0",
     "deep-equal": "^1.0.1",
+    "file-saver": "^2.0.2",
     "json-to-ast": "^2.1.0",
     "markdown-it": "^9.0.1",
     "react": "^16.8.6",
@@ -12,6 +13,7 @@
     "react-dom": "^16.8.6",
     "react-html-parser": "^2.0.2",
     "react-scripts": "3.0.1",
+    "react-select": "^3.0.4",
     "react-select-search": "^0.9.6",
     "typography": "^0.16.19",
     "typography-plugin-code": "^0.16.19",

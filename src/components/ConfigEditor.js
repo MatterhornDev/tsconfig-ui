@@ -37,29 +37,17 @@ function genCodeString2 (data = {}) {
   return str
 }
 
-function genCodeString ( data ) {
-  let str = '{\n  "compilerOptions": {'
-  data && data.forEach((v, i) => {
-    str += 
-      '\n    ' + 
-      `<span data-value="${v.option}"></span>` + 
-      ': ' + 
-      v.defaultValue + 
-      (i === data.length - 1 ? '' : ',')
-  })
-  str += '\n  }\n}'
-  return str
-}
-
 class ConfigEditor extends React.Component {
   async componentDidMount() {
-    const res = await fetch('http://localhost:3000/tsconfig/defaults')
-    const json = await res.json()
-    const configuration = {
-      compilerOptions: {}
+    let configuration = window.localStorage.getItem('configuration')
+    if (!configuration) {
+      const res = await fetch('http://localhost:3000/tsconfig/defaults')
+      const json = await res.json()
+      configuration = { compilerOptions: {} }
+      json.forEach(v => configuration.compilerOptions[v.option] = v.defaultValue)
+    } else {
+      configuration = JSON.parse(configuration)
     }
-
-    json.forEach(v => configuration.compilerOptions[v.option] = v.defaultValue)
 
     this.props.handleSetConfiguration(configuration)
   }
@@ -71,7 +59,7 @@ class ConfigEditor extends React.Component {
           <p>Loading . . .</p>
         ) : (
           <pre>
-            <code>
+            <code className="configEditor">
               {
                 ReactHtmlParser(
                   genCodeString2(this.props.configuration),
