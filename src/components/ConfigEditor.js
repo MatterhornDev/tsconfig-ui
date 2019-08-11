@@ -1,124 +1,89 @@
 import React from 'react'
-import parse from 'json-to-ast'
-import { reduce } from 'conditional-reduce'
 import ReactHtmlParser from 'react-html-parser'
 
-const o = {
-  foo: 'bar',
-  abc: {
-    k: 'v',
-    a: 'z',
-    fuzz: true
-  }, 
-  xyz: [1, 'a'] 
-}
-const s = JSON.stringify(o, 0, 2)
-const ast = parse(s)
-
-console.log(ast)
-
-const Identifier = ({ handleKeySelect, value, raw }) => {
+const ConfigOption = ({ handleOptionSelect, value }) => {
   return (
     <span
       className='identifier'
-      onClick={() => handleKeySelect(value)}
+      onClick={() => handleOptionSelect(value)}
     >
-      {raw}
+      "{value}"
     </span>
   )
 }
 
-// Construct String by joining all in strArr
-function conStr(strArr) {
-  return strArr.join('')
-}
+function genCodeString2 (data = {}) {
+  let str = '{\n'
+  for (let k in data) {
+    str += '  "' + k + '": {'
 
-function build(obj, args = { isRoot: true }) {
-  if (Array.isArray(obj)) {
-    return obj.reduce(
-      (accumulator, child, index) =>
-        accumulator + (
-          reduce(
-            child.type,
-            {
-              Property: () => build(child, { 
-                index,
-                isRoot: false,
-                lastProp: index === obj.length - 1 
-              }),
-              Literal: () => build(child, {
-                index,
-                isLiteralInArray: true,
-                isLastLiteralInArray: index === obj.length - 1
-              }),
-            },
-            () => build(child, { index })
-          )
-        ),
-      ''
-    )
-  } else if (typeof obj === 'object') {
-    switch (obj.type) {
-      case 'Object':
-        return conStr([
-          '{',
-          build(obj.children, args),
-          '\n',
-          (args.isRoot ? '' : ' '.repeat(obj.loc.end.column - 1)),
-          '}'
-        ])
-      case 'Property':
-        return conStr([
-          '\n',
-          (' '.repeat(obj.loc.start.column)),
-          build(obj.key, args),
-          ': ',
-          build(obj.value, args),
-          (args.lastProp ? '' : ',')
-        ])
-      case 'Identifier':
-        return `<span name='identifier' data-value='${obj.value}' data-raw='${obj.raw}'>${obj.raw}</span>`
-      case 'Literal':
-        return conStr([
-          obj.raw,
-          (args.isLiteralInArray && !args.isLastLiteralInArray ? ', ' : '')
-        ])
-      case 'Array':
-        return conStr([
-          '[',
-          build(obj.children, args),
-          ']'
-        ])
-      default:
-        return ``
+    if (Object.keys(data[k]) === []) {
+      str += ' },\n'
+      continue
     }
+
+    for (let l in data[k]) {
+      str +=
+        '\n    ' +
+        `<span data-value="${l}"></span>` +
+        ': ' +
+        data[k][l] +
+        ','
+    }
+
+    str += '\n  },\n'
   }
+  str += '}'
+  return str
 }
 
-const ConfigEditor = ({ handleKeySelect }) => (
-  <div className="configEditor-container">
-    <pre>
-      <code>
-        {ReactHtmlParser(
-          build(ast),
-          {
-            transform: ({ name, attribs }, index) => {
-              if (name === 'span') {
-                return (
-                  <Identifier
-                    key={`Identifier-${index}`}
-                    value={attribs['data-value']}
-                    raw={attribs['data-raw']}
-                    handleKeySelect={handleKeySelect}
-                  />
+class ConfigEditor extends React.Component {
+  async componentDidMount() {
+    let configuration = window.localStorage.getItem('configuration')
+    if (!configuration) {
+      const res = await fetch('http://localhost:3000/tsconfig/defaults')
+      const json = await res.json()
+      configuration = { compilerOptions: {} }
+      json.forEach(v => configuration.compilerOptions[v.option] = v.defaultValue)
+    } else {
+      configuration = JSON.parse(configuration)
+    }
+
+    this.props.handleSetConfiguration(configuration)
+  }
+
+  render() {
+    return (
+      <div className="configEditor-container">
+        {!this.props.configuration ? (
+          <p>Loading . . .</p>
+        ) : (
+          <pre>
+            <code className="configEditor">
+              {
+                ReactHtmlParser(
+                  genCodeString2(this.props.configuration),
+                  {
+                    transform: ({ name, attribs }, index) => {
+                      if (name === 'span') {
+                        return (
+                          <ConfigOption
+                            key={`option-${index}`}
+                            value={attribs['data-value']}
+                            handleOptionSelect={this.props.handleOptionSelect}
+                          />
+                        )
+                      }
+                    }
+                  }
                 )
               }
-            }
-          }
+            </code>
+          </pre>
         )}
-      </code>
-    </pre>
-  </div>
-)
+      </div>
+    )
+  }
+}
 
 export default ConfigEditor
