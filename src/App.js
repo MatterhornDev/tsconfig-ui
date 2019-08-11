@@ -108,9 +108,9 @@ class App extends React.Component {
           configuration={this.state.configuration}
           handleAddOption={this.addOption}
           handleRemoveOption={this.removeOption}
-          handleEditOption={this.editOption}
           selectedOption={this.state.selectedOption} 
           handleOptionSelect={this.onSelectOption}
+          handleEditOption={this.editOption}
         />
       </div>
     );

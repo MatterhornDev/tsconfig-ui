@@ -203,3 +203,7 @@ code {
   background: rgb(0, 123, 255);
   border: 1px solid rgb(0, 123, 255);
 }
+
+.warning {
+  color: rgb(220, 53, 69);
+}

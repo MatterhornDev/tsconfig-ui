@@ -6,6 +6,7 @@ import MarkdownIt from 'markdown-it'
 const md = new MarkdownIt()
 
 class Edit extends React.Component {
+  // this.props.handleChange requires just the value
   state = {
     options: undefined
   }
@@ -14,6 +15,13 @@ class Edit extends React.Component {
       { value: true, label: 'true' },
       { value: false, label: 'false' },
     ]
+  }
+  handleChange = input => {
+    if (this.props.type === 'boolean') {
+      this.props.handleChange(input.value)
+    } else {
+      this.props.handleChange(input.target.value)
+    }
   }
   componentDidUpdate(prevProps) {
     if (prevProps.type !== this.props.type) {
@@ -29,14 +37,18 @@ class Edit extends React.Component {
   }
   render() {
     const { options } = this.state
-    const { selectedOption, handleChange } = this.props
+    let { type, controlledEditValue } = this.props
     return (
-      <Select 
-        value={selectedOption}
-        onChange={handleChange}
-        options={options}
-        className='option-controller-select'
-      />
+      type === 'string' ? (
+        <input value={controlledEditValue} onChange={this.handleChange}/>
+      ) : (
+        <Select 
+          value={controlledEditValue}
+          onChange={this.handleChange}
+          options={options}
+          className='option-controller-select'
+        />
+      )
     )
   }
 }
@@ -47,11 +59,11 @@ class DocExplorer extends React.Component {
     searchText: '',
     options: [],
     searchList: [],
-    selectedEditOption: undefined
+    controlledEditValue: undefined // this needs to be the value of the props.selectedOption
   }
 
-  handleChangeEditOption = selectedEditOption => {
-    this.setState({ selectedEditOption })
+  handleChangeEditOption = value => {
+    this.setState({ controlledEditValue: value })
   }
 
   async componentDidMount() {
@@ -93,7 +105,16 @@ class DocExplorer extends React.Component {
           this.state.isLoadingDocs !== undefined && (
             !this.state.isLoadingDocs && this.state.data !== undefined ? (
               <React.Fragment>
-                <div dangerouslySetInnerHTML={{__html: md.render(this.state.data.extendedDescription)}}/>
+                {
+                  this.state.data.extendedDescription === "" ? (
+                    <div>
+                      <p className="warning"><span role="img" aria-label="Warning Emoji">⚠️</span> This compiler option documentation is incomplete.</p>
+                      <p>{this.state.data.description}</p>
+                    </div>
+                  ) : (
+                    <div dangerouslySetInnerHTML={{__html: md.render(this.state.data.extendedDescription)}}/>
+                  )
+                }
                 <hr />
                 <strong>References</strong>
                 <ul>
@@ -126,7 +147,7 @@ class DocExplorer extends React.Component {
                       this.props.configuration.compilerOptions.hasOwnProperty(this.props.selectedOption) ? (
                         <React.Fragment>
                           <Edit
-                            selectedOption={this.state.editOption}
+                            controlledEditValue={this.props.controlledEditValue}
                             handleChange={this.handleChangeEditOption}
                             type={this.state.data.type}
                           />
@@ -135,7 +156,7 @@ class DocExplorer extends React.Component {
                             className='option-controller-button edit-button'
                             onClick={() => this.props.handleEditOption({
                               option: this.props.selectedOption,
-                              value: this.state.selectedEditOption.value
+                              value: this.state.controlledEditValue
                             })}
                           >Edit</button>
                         </React.Fragment>
