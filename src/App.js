@@ -47,12 +47,14 @@ class App extends React.Component {
   }
 
   editOption = ({ option, value }) => {
-    this.setState(({ configuration }) => {
-      configuration.compilerOptions[option] = value
-      return {
-        configuration
-      }
-    })
+    if (value) {
+      this.setState(({ configuration }) => {
+        configuration.compilerOptions[option] = value
+        return {
+          configuration
+        }
+      })
+    }
   }
 
   resetConfig = () => {
@@ -72,11 +74,12 @@ class App extends React.Component {
       res[k1] = configuration[k1]
       for (let k2 in configuration[k1]) {
         let v = configuration[k1][k2]
-        if ( v === 'true' ) {
+        if ( v === 'true' || v === true ) {
           res[k1][k2] = true
-        } else if ( v === 'false' ) {
+        } else if ( v === 'false' || v === false) {
           res[k1][k2] = false
         } else {
+          console.log(v)
           res[k1][k2] = v.replace(/"(.*)"/, '$1').replace(/\\"(\w*)\\"/, '$1') 
         }
       }

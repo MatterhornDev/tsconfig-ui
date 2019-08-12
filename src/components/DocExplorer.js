@@ -42,7 +42,8 @@ class Edit extends React.Component {
       type === 'string' ? (
         <input value={controlledEditValue} onChange={this.handleChange}/>
       ) : (
-        <Select 
+        <Select
+          isSearchable={false}
           value={controlledEditValue}
           onChange={this.handleChange}
           options={options}
@@ -63,7 +64,9 @@ class DocExplorer extends React.Component {
   }
 
   handleChangeEditOption = value => {
-    this.setState({ controlledEditValue: value })
+    if (value) {
+      this.setState({ controlledEditValue: value })
+    }
   }
 
   async componentDidMount() {
