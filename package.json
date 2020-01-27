@@ -14,7 +14,7 @@
     "react-html-parser": "^2.0.2",
     "react-scripts": "3.0.1",
     "react-select": "^3.0.4",
-    "react-select-search": "^0.9.6",
+    "react-select-search": "^0.10.2",
     "typography": "^0.16.19",
     "typography-plugin-code": "^0.16.19",
     "typography-theme-github": "^0.16.19"
