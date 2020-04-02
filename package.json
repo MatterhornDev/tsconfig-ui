@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "conditional-reduce": "^1.2.0",
-    "deep-equal": "^1.0.1",
+    "deep-equal": "^2.0.2",
     "file-saver": "^2.0.2",
     "json-to-ast": "^2.1.0",
     "markdown-it": "^9.0.1",
