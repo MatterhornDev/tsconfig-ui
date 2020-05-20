@@ -7,7 +7,7 @@
     "deep-equal": "^1.0.1",
     "file-saver": "^2.0.2",
     "json-to-ast": "^2.1.0",
-    "markdown-it": "^9.0.1",
+    "markdown-it": "^11.0.0",
     "react": "^16.8.6",
     "react-accessible-accordion": "^3.0.0",
     "react-dom": "^16.8.6",
